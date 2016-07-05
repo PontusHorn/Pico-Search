@@ -58,3 +58,12 @@ template file or on a specific page.
     });
 </script>
 ```
+
+## Configuration options
+
+You can exclude certain pages from being included in the search results by using the configuration option `search_excludes`.
+Set it to an array of pages you'd like to exclude, where each page is specified as its path relative to the content root:
+
+```
+$config['search_excludes'] = ['search', 'some/other/page'];
+```

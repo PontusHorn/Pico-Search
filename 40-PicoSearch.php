@@ -59,6 +59,14 @@ class PicoSearch extends AbstractPicoPlugin
                 });
             }
 
+            $pico = $this->getPico();
+            $excludes = $pico->getConfig('search_excludes');
+            if (!empty($excludes)) {
+                foreach ($excludes as $exclude_path) {
+                    unset($pages[$exclude_path]);
+                }
+            }
+
             if (isset($this->search_terms)) {
                 $pages = array_filter($pages, function ($page) {
                     return (stripos($page['title'], $this->search_terms) !== false)
