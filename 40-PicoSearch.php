@@ -15,10 +15,10 @@ class PicoSearch extends AbstractPicoPlugin
     private $search_terms;
 
     /**
-	 * Parses the requested URL to determine if a search has been requested. The search may be
-	 * scoped to a folder. An example URL: yourdomain.com/blog/search/foobar/page/2,
-	 * which searches the /blog folder for "foobar" and shows the second page of results using
-	 * e.g. https://github.com/rewdy/Pico-Pagination.
+     * Parses the requested URL to determine if a search has been requested. The search may be
+     * scoped to a folder. An example URL: yourdomain.com/blog/search/foobar/page/2,
+     * which searches the /blog folder for "foobar" and shows the second page of results using
+     * e.g. https://github.com/rewdy/Pico-Pagination.
      *
      * @see    Pico::getBaseUrl()
      * @see    Pico::getRequestUrl()
@@ -28,11 +28,39 @@ class PicoSearch extends AbstractPicoPlugin
     public function onRequestUrl(&$url)
     {
         if (preg_match('/^(.+\/)?search\/([^\/]+)(\/.+)?$/', $url, $matches)) {
-            $url = $matches[1] . 'search' . ($matches[3] ?: '');
             $this->search_terms = urldecode($matches[2]);
 
             if (!empty($matches[1])) {
                 $this->search_area = $matches[1];
+            }
+        }
+    }
+
+    /**
+     * If accessing search results, {@link Pico::discoverRequestFile()} will have failed since
+     * the search terms are included in the URL but do not map to a file. Therefore, 
+     *
+     * @see    Pico::discoverRequestFile()
+     * @param  string &$url request URL
+     * @return void
+     */
+    public function onRequestFile(&$file)
+    {
+        if ($this->search_terms) {
+            $pico = $this->getPico();
+
+            // Aggressively strip out any ./ or ../ parts from the search area before using it
+            // as the folder to look in. Should already be taken care of previously, but just
+            // as a safeguard to make sure nothing slips through the cracks.
+            if ($this->search_area) {
+                $folder = str_replace('\\', '/', $this->search_area);
+                $folder = preg_replace('~\b../~', '', $folder);
+                $folder = preg_replace('~\b./~', '', $folder);
+            }
+
+            $temp_file = $pico->getConfig('content_dir') . ($folder ?: '') . 'search' . $pico->getConfig('content_ext');
+            if (file_exists($temp_file)) {
+                $file = $temp_file;
             }
         }
     }
