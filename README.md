@@ -27,7 +27,7 @@ Template: search
 Your template file (`search.html` in the above example) should contain something like the following section, which
 lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
 
-```
+```twig
 {% for page in pages %}
 <div class="search_result">
 	<h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
@@ -44,7 +44,7 @@ in a sub-folder) and see the search results for "foobar" listed.
 How to design your search form is up to you, but here's a very rudimentary example which you can put either in a
 template file or on a specific page.
 
-```
+```html
 <form id="search_form">
     <label for="search_input">Search the site:</label>
     <input type="search" id="search_input" />
@@ -64,6 +64,6 @@ template file or on a specific page.
 You can exclude certain pages from being included in the search results by using the configuration option `search_excludes`.
 Set it to an array of pages you'd like to exclude, where each page is specified as its path relative to the content root:
 
-```
+```php
 $config['search_excludes'] = ['search', 'some/other/page'];
 ```
