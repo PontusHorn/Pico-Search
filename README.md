@@ -45,12 +45,13 @@ How to design your search form is up to you, but here's a very rudimentary examp
 template file or on a specific page.
 
 ```html
-<form id="search_form">
+<form id="search_form" action="/search">
     <label for="search_input">Search the site:</label>
-    <input type="search" id="search_input" />
+    <input type="search" id="search_input" name="q" />
     <input type="submit" value="Search" />
 </form>
 <script type="text/javascript">
+    // Intercept form submit and go to the search results page directly, avoiding a redirect
     document.getElementById('search_form').addEventListener('submit', function (e) {
         var search_terms = document.getElementById('search_input').value;
         location.href = '/search/' + encodeURIComponent(search_terms);
