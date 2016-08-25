@@ -28,12 +28,12 @@ class PicoSearch extends AbstractPicoPlugin
     public function onRequestUrl(&$url)
     {
         // If form was submitted without being intercepted by JavaScript, redirect to the canonical search URL.
-        if (preg_match('/^(.+\/)?search$/', $url) && $_GET['q']) {
+        if (preg_match('~^(.+/)?search$~', $url) && $_GET['q']) {
             header('Location: ' . $this->getPico()->getBaseUrl() . $url . '/' . urlencode($_GET['q']));
             exit;
         }
 
-        if (preg_match('/^(.+\/)?search\/([^\/]+)(\/.+)?$/', $url, $matches)) {
+        if (preg_match('~^(.+/)?search/([^/]+)(/.+)?$~', $url, $matches)) {
             $this->search_terms = urldecode($matches[2]);
 
             if (!empty($matches[1])) {
