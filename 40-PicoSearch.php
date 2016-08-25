@@ -44,10 +44,11 @@ class PicoSearch extends AbstractPicoPlugin
 
     /**
      * If accessing search results, {@link Pico::discoverRequestFile()} will have failed since
-     * the search terms are included in the URL but do not map to a file. Therefore, 
+     * the search terms are included in the URL but do not map to a file. This method takes care
+     * of finding the appropriate file.
      *
      * @see    Pico::discoverRequestFile()
-     * @param  string &$url request URL
+     * @param  string &$file request file
      * @return void
      */
     public function onRequestFile(&$file)
