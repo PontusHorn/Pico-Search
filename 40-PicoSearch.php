@@ -61,8 +61,8 @@ class PicoSearch extends AbstractPicoPlugin
             // as a safeguard to make sure nothing slips through the cracks.
             if ($this->search_area) {
                 $folder = str_replace('\\', '/', $this->search_area);
-                $folder = preg_replace('~\b../~', '', $folder);
-                $folder = preg_replace('~\b./~', '', $folder);
+                $folder = preg_replace('~\.\./~', '', $folder);
+                $folder = preg_replace('~\./~', '', $folder);
             }
 
             $temp_file = $pico->getConfig('content_dir') . ($folder ?: '') . 'search' . $pico->getConfig('content_ext');
