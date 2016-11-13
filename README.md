@@ -28,14 +28,18 @@ Your template file (`search.html` in the above example) should contain something
 lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
 
 ```twig
-{% if pages %}
-    {% for page in pages %}
-        <div class="search_result">
-	    <h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
-	    {% if page.description %}<p>{{ page.description }}</p>{% endif %}
-        </div>
-    {% endfor %}
-{% endif %}
+<div class="SearchResults">
+    {% if pages %}
+        {% for page in pages %}
+            <div class="SearchResult">
+                <h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
+                {% if page.description %}<p>{{ page.description }}</p>{% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+</div>
 ```
 
 Now, you should be able to visit for example `yoursite.com/search/foobar` (adjust path accordingly if putting search.md
