@@ -12,35 +12,35 @@ The search plugin should be executed before the pagination plugin (execution ord
 
 ## Installation
 
-Copy the file `40-PicoSearch.php` to the `plugins` sub-folder of your Pico installation directory. Add a file named
-`search.md` to your content root or the sub-folder you want to make searchable. This is your search results page. You
-can leave it empty of content, but set the `Template` meta tag to a template that loops through the pages and displays
-them. Your `search.md` might look like this:
-
-```
-/*
-Title: Search results
-Template: search
-*/
-```
-
-Your template file (`search.html` in the above example) should contain something like the following section, which
-lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
-
-```twig
-<div class="SearchResults">
-    {% if pages %}
-        {% for page in pages %}
-            <div class="SearchResult">
-                <h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
-                {% if page.description %}<p>{{ page.description }}</p>{% endif %}
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No results found.</p>
-    {% endif %}
-</div>
-```
+* **Copy the file `40-PicoSearch.php` to the `plugins` sub-folder of your Pico installation directory.**
+* **Add a file named `search.md` to your content root or the sub-folder you want to make searchable.**
+  This is your search results page. You can leave it empty of content, but set the `Template` meta tag to a template
+  that loops through the pages and displays them. Your `search.md` might look like this:
+  
+  ```
+  /*
+  Title: Search results
+  Template: search
+  */
+  ```
+* **Add a template file with the name defined in `search.md`.**
+  Your template file (`search.html` in the above example) should contain something like the following section, which
+  lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
+  
+  ```twig
+  <div class="SearchResults">
+      {% if pages %}
+          {% for page in pages %}
+              <div class="SearchResult">
+                  <h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
+                  {% if page.description %}<p>{{ page.description }}</p>{% endif %}
+              </div>
+          {% endfor %}
+      {% else %}
+          <p>No results found.</p>
+      {% endif %}
+  </div>
+  ```
 
 Now, you should be able to visit for example `yoursite.com/search/foobar` (adjust path accordingly if putting search.md
 in a sub-folder) and see the search results for "foobar" listed.
