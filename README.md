@@ -24,7 +24,7 @@ The search plugin should be executed before the pagination plugin (execution ord
   */
   ```
 * **Add a template file with the name defined in `search.md`.**
-  Your template file (`search.html` in the above example) should contain something like the following section, which
+  Your template file (`search.twig` in the above example) should contain something like the following section, which
   lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
   
   ```twig
@@ -40,6 +40,20 @@ The search plugin should be executed before the pagination plugin (execution ord
           <p>No results found.</p>
       {% endif %}
   </div>
+  ```
+
+  If you simply want to make your search results page look like your standard page, you may want to edit your theme's `index.twig` file and change `{{ content }}` to `{% block content %} {{ content }} {% endblock %}`. This allows you to extend this base template and reuse all the other parts of it in your search results template:
+
+  ```twig
+  {% extends "index.twig" %}
+  
+  {% block content %}
+      {{ parent() }}
+      
+      <div class="SearchResults">
+          <!-- Put the code for your search results here -->
+      </div>
+  {% endblock content %}
   ```
 
 Now, you should be able to visit for example `yoursite.com/search/foobar` (adjust path accordingly if putting search.md
