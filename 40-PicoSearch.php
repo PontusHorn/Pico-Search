@@ -64,7 +64,7 @@ class PicoSearch extends AbstractPicoPlugin
                 $folder = preg_replace('~\.+/~', '', $folder);
             }
 
-            $temp_file = $pico->getConfig('content_dir').$folder.'search'.$pico->getConfig('content_ext');
+            $temp_file = $pico->getConfig('content_dir') . $folder . 'search' . $pico->getConfig('content_ext');
             if (file_exists($temp_file)) {
                 $file = $temp_file;
             }
@@ -100,7 +100,7 @@ class PicoSearch extends AbstractPicoPlugin
                     unset($pages[$exclude_path]);
                 }
             }
-
+            
             if (isset($this->search_terms)) {
                 $pages = array_filter($pages, function ($page) {
                     return (stripos($page['title'], $this->search_terms) !== false)
