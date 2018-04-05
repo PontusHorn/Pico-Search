@@ -100,7 +100,6 @@ class PicoSearch extends AbstractPicoPlugin
                     unset($pages[$exclude_path]);
                 }
             }
-            
             if (isset($this->search_terms)) {
                 $pages = array_filter($pages, function ($page) {
                     return (stripos($page['title'], $this->search_terms) !== false)
