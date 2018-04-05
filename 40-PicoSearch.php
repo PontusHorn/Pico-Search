@@ -28,7 +28,7 @@ class PicoSearch extends AbstractPicoPlugin
     public function onRequestUrl(&$url)
     {
         // If form was submitted without being intercepted by JavaScript, redirect to the canonical search URL.
-        if (preg_match('~^(.+/)?search$~', $url) && $_GET['q']) {
+        if (preg_match('~^(.+/)?search$~', $url) && isset($_GET['q'])) {
             header('Location: ' . $this->getPico()->getBaseUrl() . $url . '/' . urlencode($_GET['q']));
             exit;
         }
@@ -55,7 +55,7 @@ class PicoSearch extends AbstractPicoPlugin
     {
         if ($this->search_terms) {
             $pico = $this->getPico();
-
+            $folder = '';
             // Aggressively strip out any ./ or ../ parts from the search area before using it
             // as the folder to look in. Should already be taken care of previously, but just
             // as a safeguard to make sure nothing slips through the cracks.
@@ -64,7 +64,7 @@ class PicoSearch extends AbstractPicoPlugin
                 $folder = preg_replace('~\.+/~', '', $folder);
             }
 
-            $temp_file = $pico->getConfig('content_dir') . ($folder ?: '') . 'search' . $pico->getConfig('content_ext');
+            $temp_file = $pico->getConfig('content_dir') . $folder . 'search' . $pico->getConfig('content_ext');
             if (file_exists($temp_file)) {
                 $file = $temp_file;
             }
@@ -100,7 +100,6 @@ class PicoSearch extends AbstractPicoPlugin
                     unset($pages[$exclude_path]);
                 }
             }
-
             if (isset($this->search_terms)) {
                 $pages = array_filter($pages, function ($page) {
                     return (stripos($page['title'], $this->search_terms) !== false)
