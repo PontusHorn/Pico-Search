@@ -102,11 +102,73 @@ class PicoSearch extends AbstractPicoPlugin
             }
 
             if (isset($this->search_terms)) {
+                $pages = array_map(function ($page) {
+                    $page['search_rank'] = $this->getSearchRankForPage($page);
+                    return $page;
+                }, $pages);
+
                 $pages = array_filter($pages, function ($page) {
-                    return (stripos($page['title'], $this->search_terms) !== false)
-                        || (stripos($page['raw_content'], $this->search_terms) !== false);
+                    return $page['search_rank'] > 0;
+                });
+
+                uasort($pages, function ($a, $b) {
+                    if ($a['search_rank'] == $b['search_rank']) {
+                        return 0;
+                    }
+
+                    return $a['search_rank'] > $b['search_rank'] ? -1 : 1;
                 });
             }
         }
+    }
+
+    public function getSearchRankForPage($page) {
+        // If there's an exact match in the title, skip a bunch of work and give it a very high score
+        $escaped_search_terms = preg_quote($this->search_terms, '/');
+        if (preg_match("/\b$escaped_search_terms\b/i", $page['title']) === 1) {
+            return 5;
+        }
+
+        $searchTerms = preg_split('/\s+/', $this->search_terms);
+        $keyTerms = array_filter($searchTerms, function ($searchTerm) {
+            return !$this->isLowValueWord($searchTerm);
+        });
+
+        // Only search through key terms if any exist
+        if (!empty($keyTerms)) {
+            $searchTerms = $keyTerms;
+        }
+
+        return array_sum(
+            array_map(
+                function ($searchTerm) use ($page) {
+                    return $this->getSearchRankForString($searchTerm, $page['title']) +
+                        $this->getSearchRankForString($searchTerm, $page['raw_content']) * 0.2;
+                },
+                $searchTerms
+            )
+        );
+    }
+
+    public function getSearchRankForString($searchTerm, $content) {
+        $searchTermValue = $this->isLowValueWord($searchTerm) ? 0.2 : 1;
+        $escapedSearchTerm = preg_quote($searchTerm, '/');
+
+        $fullWordMatches = preg_match_all("/\b$escapedSearchTerm\b/i", $content);
+        if ($fullWordMatches > 0) {
+            return min($fullWordMatches, 3) * $searchTermValue;
+        }
+
+        $startOfWordMatches = preg_match_all("/\b$escapedSearchTerm\B/i", $content);
+        if ($startOfWordMatches > 0) {
+            return min($startOfWordMatches, 3) * 0.5 * $searchTermValue;
+        }
+
+        $inWordMatches = preg_match_all("/\B$escapedSearchTerm\B/i", $content);
+        return min($inWordMatches, 3) * 0.05 * $searchTermValue;
+    }
+
+    public function isLowValueWord($word) {
+        return in_array(mb_strtolower($searchTerm), $this->getPluginConfig('low_value_words'));
     }
 }
