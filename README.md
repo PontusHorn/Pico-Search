@@ -12,44 +12,48 @@ The search plugin should be executed before the pagination plugin (execution ord
 
 ## Installation
 
-* **Copy the file `40-PicoSearch.php` to the `plugins` sub-folder of your Pico installation directory.**
-* **Add a file named `search.md` to your content root or the sub-folder you want to make searchable.**
+- **Copy the file `40-PicoSearch.php` to the `plugins` sub-folder of your Pico installation directory.**
+- **Add a file named `search.md` to your content root or the sub-folder you want to make searchable.**
   This is your search results page. You can leave it empty of content, but set the `Template` meta tag to a template
   that loops through the pages and displays them. Your `search.md` might look like this:
-  
+
   ```
   /*
   Title: Search results
   Template: search
   */
   ```
-* **Add a template file with the name defined in `search.md`.**
+
+- **Add a template file with the name defined in `search.md`.**
   Your template file (`search.twig` in the above example) should contain something like the following section, which
   lists the pages matching the search (substitute `paged_pages` for `pages` if using Pico-Pagination):
-  
+
   ```twig
-  <div class="SearchResults">
-      {% if pages %}
-          {% for page in pages %}
-              <div class="SearchResult">
-                  <h2><a href="{{ page.url }}">{{ page.title }}</a></h2>
-                  {% if page.description %}<p>{{ page.description }}</p>{% endif %}
-              </div>
-          {% endfor %}
-      {% else %}
-          <p>No results found.</p>
-      {% endif %}
-  </div>
+  {% if search_terms %}
+    <div class="SearchResults">
+        {% if pages %}
+            <h2>Search results for {{ search_terms|e('html') }}</h2>
+            {% for page in pages %}
+                <div class="SearchResult">
+                    <h3><a href="{{ page.url }}">{{ page.title }}</a></h3>
+                    {% if page.description %}<p>{{ page.description }}</p>{% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No results found for {{ search_terms|e('html') }}.</p>
+        {% endif %}
+    </div>
+  {% endif %}
   ```
 
   If you simply want to make your search results page look like your standard page, you may want to edit your theme's `index.twig` file and change `{{ content }}` to `{% block content %} {{ content }} {% endblock %}`. This allows you to extend this base template and reuse all the other parts of it in your search results template:
 
   ```twig
   {% extends "index.twig" %}
-  
+
   {% block content %}
       {{ parent() }}
-      
+
       <div class="SearchResults">
           <!-- Put the code for your search results here -->
       </div>
@@ -67,7 +71,7 @@ template file:
 ```html
 <form id="search_form" action="{{ "search"|link }}">
     <label for="search_input">Search the site:</label>
-    <input type="search" id="search_input" name="q" />
+    <input type="search" id="search_input" name="q" value="{{ search_terms|e('html_attr') }}" />
     <input type="submit" value="Search" />
 </form>
 <script type="text/javascript">
