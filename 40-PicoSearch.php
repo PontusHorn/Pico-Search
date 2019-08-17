@@ -125,7 +125,7 @@ class PicoSearch extends AbstractPicoPlugin
     public function getSearchRankForPage($page) {
         // If there's an exact match in the title, skip a bunch of work and give it a very high score
         $escaped_search_terms = preg_quote($this->search_terms, '/');
-        if (preg_match("/\b$escaped_search_terms\b/i", $page['title']) === 1) {
+        if (preg_match("/\b$escaped_search_terms\b/iu", $page['title']) === 1) {
             return 5;
         }
 
@@ -154,17 +154,17 @@ class PicoSearch extends AbstractPicoPlugin
         $searchTermValue = $this->isLowValueWord($searchTerm) ? 0.2 : 1;
         $escapedSearchTerm = preg_quote($searchTerm, '/');
 
-        $fullWordMatches = preg_match_all("/\b$escapedSearchTerm\b/i", $content);
+        $fullWordMatches = preg_match_all("/\b$escapedSearchTerm\b/iu", $content);
         if ($fullWordMatches > 0) {
             return min($fullWordMatches, 3) * $searchTermValue;
         }
 
-        $startOfWordMatches = preg_match_all("/\b$escapedSearchTerm\B/i", $content);
+        $startOfWordMatches = preg_match_all("/\b$escapedSearchTerm\B/iu", $content);
         if ($startOfWordMatches > 0) {
             return min($startOfWordMatches, 3) * 0.5 * $searchTermValue;
         }
 
-        $inWordMatches = preg_match_all("/\B$escapedSearchTerm\B/i", $content);
+        $inWordMatches = preg_match_all("/\B$escapedSearchTerm\B/iu", $content);
         return min($inWordMatches, 3) * 0.05 * $searchTermValue;
     }
 
