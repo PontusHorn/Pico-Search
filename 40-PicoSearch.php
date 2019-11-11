@@ -55,6 +55,7 @@ class PicoSearch extends AbstractPicoPlugin
     {
         if ($this->search_terms) {
             $pico = $this->getPico();
+            $folder = '';
 
             // Aggressively strip out any ./ or ../ parts from the search area before using it
             // as the folder to look in. Should already be taken care of previously, but just
@@ -64,7 +65,7 @@ class PicoSearch extends AbstractPicoPlugin
                 $folder = preg_replace('~\.+/~', '', $folder);
             }
 
-            $temp_file = $pico->getConfig('content_dir') . ($folder ?: '') . 'search' . $pico->getConfig('content_ext');
+            $temp_file = $pico->getConfig('content_dir') . $folder . 'search' . $pico->getConfig('content_ext');
             if (file_exists($temp_file)) {
                 $file = $temp_file;
             }
