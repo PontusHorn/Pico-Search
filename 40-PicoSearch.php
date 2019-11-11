@@ -170,7 +170,7 @@ class PicoSearch extends AbstractPicoPlugin
     }
 
     public function isLowValueWord($word) {
-        return in_array(mb_strtolower($searchTerm), $this->getPluginConfig('low_value_words') ?: []);
+        return in_array(mb_strtolower($word), $this->getPluginConfig('low_value_words') ?: []);
     }
 
     public function onPageRendering(&$twig, &$twigVariables, &$templateName) {
