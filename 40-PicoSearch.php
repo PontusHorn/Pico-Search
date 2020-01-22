@@ -73,54 +73,52 @@ class PicoSearch extends AbstractPicoPlugin
     }
 
     /**
-     * If accessing search results, filter the $pages array to pages matching the search terms.
+     * Filter the input array to pages matching the search terms
+     * and sort them by relevance.
      *
-     * @see    Pico::getPages()
-     * @see    Pico::getCurrentPage()
-     * @see    Pico::getPreviousPage()
-     * @see    Pico::getNextPage()
-     * @param  array &$pages        data of all known pages
-     * @param  array &$currentPage  data of the page being served
-     * @param  array &$previousPage data of the previous page
-     * @param  array &$nextPage     data of the next page
-     * @return void
+     * @param  array $pages data of all known pages
+     * @return array filtered and sorted pages
      */
-    public function onPagesLoaded(&$pages, &$currentPage, &$previousPage, &$nextPage)
+    public function applySearch($pages)
     {
-        if ($currentPage && isset($this->search_area) || isset($this->search_terms)) {
-            if (isset($this->search_area)) {
-                $pages = array_filter($pages, function ($page) {
-                    return substr($page['id'], 0, strlen($this->search_area)) === $this->search_area;
-                });
-            }
+        if (!isset($this->search_area) && !isset($this->search_terms)) {
+            return array();
+        }
 
-            $pico = $this->getPico();
-            $excludes = $pico->getConfig('search_excludes');
-            if (!empty($excludes)) {
-                foreach ($excludes as $exclude_path) {
-                    unset($pages[$exclude_path]);
-                }
-            }
+        if (isset($this->search_area)) {
+            $pages = array_filter($pages, function ($page) {
+                return substr($page['id'], 0, strlen($this->search_area)) === $this->search_area;
+            });
+        }
 
-            if (isset($this->search_terms)) {
-                $pages = array_map(function ($page) {
-                    $page['search_rank'] = $this->getSearchRankForPage($page);
-                    return $page;
-                }, $pages);
-
-                $pages = array_filter($pages, function ($page) {
-                    return $page['search_rank'] > 0;
-                });
-
-                uasort($pages, function ($a, $b) {
-                    if ($a['search_rank'] == $b['search_rank']) {
-                        return 0;
-                    }
-
-                    return $a['search_rank'] > $b['search_rank'] ? -1 : 1;
-                });
+        $pico = $this->getPico();
+        $excludes = $pico->getConfig('search_excludes');
+        if (!empty($excludes)) {
+            foreach ($excludes as $exclude_path) {
+                unset($pages[$exclude_path]);
             }
         }
+
+        if (isset($this->search_terms)) {
+            $pages = array_map(function ($page) {
+                $page['search_rank'] = $this->getSearchRankForPage($page);
+                return $page;
+            }, $pages);
+
+            $pages = array_filter($pages, function ($page) {
+                return $page['search_rank'] > 0;
+            });
+
+            uasort($pages, function ($a, $b) {
+                if ($a['search_rank'] == $b['search_rank']) {
+                    return 0;
+                }
+
+                return $a['search_rank'] > $b['search_rank'] ? -1 : 1;
+            });
+        }
+
+        return $pages;
     }
 
     public function getSearchRankForPage($page) {
@@ -175,5 +173,9 @@ class PicoSearch extends AbstractPicoPlugin
 
     public function onPageRendering(&$twig, &$twigVariables, &$templateName) {
         $twigVariables['search_terms'] = $this->search_terms;
+    }
+
+    public function onTwigRegistration() {
+        $this->getPico()->getTwig()->addFilter(new \Twig\TwigFilter('apply_search', [$this, 'applySearch']));
     }
 }
